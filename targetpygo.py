@@ -1,6 +1,7 @@
 
 import sys, os
 from ast_load import from_string
+import interpreter, space
 from rpython.rlib.streamio import open_file_as_stream
 from rpython.rlib import rpath
 
@@ -27,11 +28,17 @@ def entry_point(argv):
 	pkg = from_string(json)
 	return run_main_package(pkg, argv[2:])
 
+prebuilt_space = space.Space()
+
 def run_main_package(pkg, args):
-	# TODO invoke ast-interpreter
-	print "%s" % pkg
+	interp = interpreter.Interpreter(prebuilt_space, pkg)
+	try:
+		interp.interpret_main(args)
+	except interpreter.InterpreterError as e:
+		print "Error: %s" % e
+		return 1
 	return 0
-	
+
 if __name__ == "__main__":
 	entry_point(sys.argv)
 
