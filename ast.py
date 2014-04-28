@@ -5,6 +5,8 @@ from rpython.tool.pairtype import extendabletype
 
 class A_Node(object):
 	__metaclass__ = extendabletype
+	def __init__(self):
+		pass
 
 class A_Package(A_Node):
 	def __init__(self):
@@ -14,7 +16,7 @@ class A_Package(A_Node):
 		self.imports = {}
 	
 	def __repr__(self):
-		return "<Package %s [%s]\nImporting: %r\nScope: %r>" % (self.name, self.importPath, self.imports, self.scope)
+		return "<Package %s [%s]\nImporting: %s\nScope: %s>" % (self.name, self.importPath, self.imports, self.scope)
 
 class A_Scope(A_Node):
 	def __init__(self):
@@ -23,12 +25,13 @@ class A_Scope(A_Node):
 		self.vars = {}
 	
 	def __repr__(self):
-		return "<Scope Funcs: %r\nTypes: %r\n Vars: %r>" % (self.funcs, self.types, self.vars)
+		return "<Scope Funcs: %s\nTypes: %s\n Vars: %s>" % (self.funcs, self.types, self.vars)
 
 # ====== Expression nodes ======
 
 class A_Expr(A_Node):
-	pass
+	def __init__(self):
+		pass
 
 illegal_expr = A_Expr()
 
@@ -141,7 +144,8 @@ class A_BlankIdentExpr(A_Expr):
 # ====== Type nodes ======
 
 class A_Type(A_Expr):
-	pass
+	def __init__(self):
+		pass
 
 illegal_type = A_Type()
 uninitialized_string = "<not initialized>"
@@ -213,7 +217,8 @@ class A_InterfaceType(A_Type):
 # ====== Statement nodes ======
 
 class A_Stmt(A_Node):
-	pass
+	def __init__(self):
+		pass
 
 illegal_stmt = A_Stmt()
 

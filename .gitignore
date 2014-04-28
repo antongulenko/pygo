@@ -53,3 +53,4 @@ coverage.xml
 docs/_build/
 
 /go-ast.json
+*.exe

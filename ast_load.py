@@ -14,7 +14,7 @@ def visit(astClass, json):
 		astObj.initialize_from(json)
 	except KeyError, k:
 		if json.is_object:
-			raise ValueError("Missing slot %s, available slots: %r" % (k, json.value_object().keys()))
+			raise ValueError("Missing slot %s, available slots: %s" % (k, json.value_object().keys()))
 		raise
 	return astObj
 
@@ -65,7 +65,7 @@ def visit_expr(json):
 	for key, astClass in expression_nodes.items():
 		if key in obj:
 			return visit(astClass, json)
-	raise ValueError("Could not handle expr node with following keys: %r" % obj.keys())
+	raise ValueError("Could not handle expr node with following keys: %s" % obj.keys())
 
 def visit_type(json):
 	# Types are just special expressions
@@ -101,18 +101,18 @@ def visit_stmt(json):
 	if len(obj.keys()) == 0:
 		return ast.A_EmptyStmt()
 	elif len(obj.keys()) != 1:
-		raise ValueError("Stmt nodes are supposed to have exactly one slot. Have: %r" % obj.keys())
+		raise ValueError("Stmt nodes are supposed to have exactly one slot. Have: %s" % obj.keys())
 	key = obj.keys()[0]
 	if key in stmt_nodes:
 		return visit(stmt_nodes[key], obj[key])
 	else:
-		raise ValueError("Could not handle stmt node with following keys: %r" % obj.keys())
+		raise ValueError("Could not handle stmt node with following keys: %s" % obj.keys())
 
 # ====== Basic nodes ======
 
 class __extend__(ast.A_Node):
 	def initialize_from(self, json):
-		raise NotImplementedError("Abstract, called on: %r" % self)
+		raise NotImplementedError("Abstract, called on: %s" % self)
 
 class __extend__(ast.A_Package):
 	def initialize_from(self, json):
@@ -160,7 +160,7 @@ class __extend__(ast.A_Expr):
 		self.initialize_from_obj(json.value_object())
 	
 	def initialize_from_obj(self, dict):
-		raise NotImplementedError("Abstract, called on: %r" % self)
+		raise NotImplementedError("Abstract, called on: %s" % self)
 
 class __extend__(ast.A_Func):
 	def initialize_from_obj(self, json):
