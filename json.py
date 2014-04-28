@@ -22,9 +22,9 @@ json_grammar = """
 """
 
 def setup_parser():
-	json_regexs, json_rules, json_ast = parse_ebnf(json_grammar)
-	json_parse = make_parse_function(json_regexs, json_rules, eof=True)
-	return json_parse, json_ast
+    json_regexs, json_rules, json_ast = parse_ebnf(json_grammar)
+    json_parse = make_parse_function(json_regexs, json_rules, eof=True)
+    return json_parse, json_ast
 
 json_parse, json_ast = setup_parser()
 
@@ -32,7 +32,7 @@ json_parse, json_ast = setup_parser()
 class JsonBase(object):
     __metaclass__ = extendabletype
 
-    is_string = is_int = is_float = is_bool = is_object = is_array = is_null = False
+    is_string = is_int = is_float = is_bool = is_false = is_true = is_object = is_array = is_null = False
 
     def __init__(self):
         raise NotImplementedError("abstract base class")
@@ -46,17 +46,23 @@ class JsonBase(object):
     def _unpack_deep(self):
         "NON_RPYTHON"
 
+    def value_bool(self):
+        raise TypeError("value_bool called on %r" % self)
+        
     def value_array(self):
-        raise TypeError
+        raise TypeError("value_array called on %r" % self)
 
     def value_object(self):
-        raise TypeError
+        raise TypeError("value_object called on %r" % self)
 
     def value_string(self):
-        raise TypeError
+        raise TypeError("value_string called on %r" % self)
 
     def value_float(self):
-        raise TypeError
+        raise TypeError("value_float called on %r" % self)
+    
+    def value_int(self):
+        raise TypeError("value_int called on %r" % self)
 
 class JsonPrimitive(JsonBase):
     def __init__(self):
@@ -76,6 +82,7 @@ class JsonNull(JsonPrimitive):
 
 class JsonFalse(JsonPrimitive):
     is_false = True
+    is_bool = True
 
     def tostring(self):
         return "false"
@@ -83,9 +90,12 @@ class JsonFalse(JsonPrimitive):
     def _unpack_deep(self):
         return False
 
+    def value_bool(self):
+        return False
 
 class JsonTrue(JsonPrimitive):
     is_true = True
+    is_bool = True
 
     def tostring(self):
         return "true"
@@ -93,6 +103,9 @@ class JsonTrue(JsonPrimitive):
     def _unpack_deep(self):
         return True
 
+    def value_bool(self):
+        return True
+    
 class JsonInt(JsonPrimitive):
     is_int = True
 
@@ -104,7 +117,13 @@ class JsonInt(JsonPrimitive):
 
     def _unpack_deep(self):
         return self.value
+    
+    def value_int(self):
+        return self.value
 
+    def value_float(self):
+        return float(self.value)
+    
 class JsonFloat(JsonPrimitive):
     is_float = True
 
@@ -117,6 +136,9 @@ class JsonFloat(JsonPrimitive):
     def value_float(self):
         return self.value
 
+    def value_int(self):
+        return int(self.value)
+        
     def _unpack_deep(self):
         return self.value
 
@@ -239,9 +261,12 @@ def decode_escape_sequence(i, chars, builder):
     elif ch == 'r': put('\r')
     elif ch == 't': put('\t')
     elif ch == 'u':
-        raise ValueError("unicode escape sequence not supported yet") # XXX
+		# XXX
+		put('?')
+		print "Warning: Ignoring unicode escape sequence %s" % chars
+		# raise ValueError("unicode escape sequence not supported yet")
     else:
-        raise ValueError("Invalid \\escape: %s" % (ch, ))
+        raise ValueError("Invalid \\escape sequence: %s" % (ch, ))
     return i
 
 def loads(string):
