@@ -18,13 +18,20 @@ def read_file(filename):
 	return (data, True)
 
 def entry_point(argv):
+	if len(argv) < 1:
+		print "Need at least 1 parameter: json file to interpret."
+		return 1
 	json, ok = read_file(argv[1])
 	if not ok:
 		return 1
 	pkg = from_string(json)
+	return run_main_package(pkg, argv[2:])
+
+def run_main_package(pkg, args):
+	# TODO invoke ast-interpreter
 	print "%s" % pkg
 	return 0
-
+	
 if __name__ == "__main__":
 	entry_point(sys.argv)
 
